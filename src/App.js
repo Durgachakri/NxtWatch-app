@@ -15,7 +15,9 @@ import './App.css'
 
 class App extends Component {
   state = {
-    savedVideoList: [],
+    savedVideoList: JSON.parse(
+    localStorage.getItem('savedVideos') || '[]'
+  ),
     isDarkTheme: false,
   }
 
@@ -26,10 +28,28 @@ class App extends Component {
   }
 
   addVideoToSavedVideosList = video => {
-    this.setState(prevState => ({
-      savedVideoList: [...prevState.savedVideoList, video],
-    }))
-  }
+  this.setState(
+    prevState => {
+      const alreadySaved = prevState.savedVideoList.some(
+        eachVideo => eachVideo.id === video.id
+      )
+
+      if (alreadySaved) {
+        return null
+      }
+
+      return {
+        savedVideoList: [...prevState.savedVideoList, video],
+      }
+    },
+    () => {
+      localStorage.setItem(
+        'savedVideos',
+        JSON.stringify(this.state.savedVideoList)
+      )
+    }
+  )
+}
 
   render() {
     const {savedVideoList, isDarkTheme} = this.state
